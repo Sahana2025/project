@@ -1,0 +1,74 @@
+<!-- templates/base.html -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}HealthBot AI{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            
+        }
+
+      
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(145deg, #1c1c1c, #2e2e2e);
+            color: #00ffcc;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            height: 100vh;
+        }
+  
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const micBtn = document.getElementById("micBtn");
+    const textarea = document.querySelector("textarea[name='message']");
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      micBtn.addEventListener("click", function () {
+        recognition.start();
+        micBtn.textContent = "🎙 Listening...";
+      });
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        textarea.value = transcript;
+        micBtn.textContent = "🎤 Speak";
+      };
+
+      recognition.onerror = function (event) {
+        console.error("Speech recognition error:", event.error);
+        micBtn.textContent = "🎤 Speak";
+      };
+
+      recognition.onend = function () {
+        micBtn.textContent = "🎤 Speak";
+      };
+    } else {
+      micBtn.disabled = true;
+      micBtn.textContent = "🎤 Voice not supported";
+    }
+  });
+</script>
+
+</body>
+</html>

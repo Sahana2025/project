@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}🌿 PlantBot Assistant{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    background: url("{% static 'imgs/plantbg.jpg' %}") no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Orbitron', sans-serif;
+    color: #e0ffe6;
+    overflow-x: hidden;
+  }
+
+  .chat-container {
+    backdrop-filter: blur(10px);
+    background-color: rgba(9, 63, 25, 0.85);
+    border-radius: 25px;
+    padding: 2.5rem;
+    margin: 4rem auto;
+    max-width: 750px;
+    box-shadow: 0 0 40px #80ff9e88;
+    position: relative;
+    overflow: hidden;
+    animation: float 4s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .chat-container::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, transparent, #80ff9e44, transparent);
+    transform: rotate(25deg);
+    animation: shine 10s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes shine {
+    0% { transform: rotate(25deg) translateX(-100%); }
+    100% { transform: rotate(25deg) translateX(100%); }
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  h2 {
+    color: #aaffcc;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    text-align: center;
+    text-shadow: 0 0 10px #80ff9e;
+  }
+
+  textarea, input[type="file"] {
+    width: 100%;
+    border: none;
+    border-radius: 15px;
+    padding: 1rem;
+    font-size: 1.2rem;
+    background-color: rgba(17, 125, 17, 0.7);
+    color: #e0ffe6;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 10px #66ff9955;
+    transition: all 0.3s ease-in-out;
+    z-index: 1;
+    position: relative;
+    resize: none;
+  }
+
+  textarea::placeholder {
+    color: #c8ffe3aa;
+  }
+
+  textarea:focus, input[type="file"]:focus {
+    outline: none;
+    box-shadow: 0 0 15px #80ff9e;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .custom-file-upload {
+    background-color: #228b22;
+    color: #e6fff0;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 0 10px #33ff99aa;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  .custom-file-upload:hover {
+    background-color: #145c14;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #80ffccaa;
+  }
+
+  #micBtn {
+    background-color: #33cc66;
+    color: #f0fff5;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 0 10px #66ff99aa;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  #micBtn:hover {
+    background-color: #29a857;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #80ffbbcc;
+  }
+
+  .input-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .submit-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .submit-btn button[type="submit"] {
+    background-color: #33cc66;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 0 12px #80ff9eaa;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-weight: bold;
+    min-width: 180px;
+  }
+
+  .submit-btn button[type="submit"]:hover {
+    background-color: #29a857;
+    transform: scale(1.08);
+    box-shadow: 0 0 18px #66ffaa;
+  }
+
+  .bot-response {
+    margin-top: 2rem;
+    background-color: #1f4a2a;
+    padding: 1.2rem;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    color: #e0ffe6;
+    white-space: pre-line;
+    box-shadow: 0 0 20px #66ff9933;
+    position: relative;
+  }
+
+  .bot-response::before {
+    content: "🌿";
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    background: #33cc66;
+    color: white;
+    border-radius: 50%;
+    padding: 10px;
+    font-size: 1.2rem;
+    box-shadow: 0 0 10px #80ff9e77;
+  }
+
+  img {
+    margin-top: 1.5rem;
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 15px #66ff9944;
+  }
+</style>
+
+<div class="chat-container">
+  <h2>🌿 Plant Disease Robo Assistant</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <textarea name="message" rows="3" placeholder="Describe your plant's issue or symptoms...">{{ user_message }}</textarea>
+
+    <div class="input-actions">
+      <button type="button" id="micBtn" onclick="startDictation()">🎤 Speak</button>
+      <label for="file-upload" class="custom-file-upload">📁 Choose Image</label>
+      <input id="file-upload" type="file" name="image">
+    </div>
+
+    <div class="submit-btn">
+      <button type="submit">🌿 Analyze</button>
+    </div>
+  </form>
+
+  {% if bot_reply %}
+    <div class="bot-response">{{ bot_reply|linebreaks }}</div>
+  {% endif %}
+
+  {% if image_url %}
+    <p><strong>Uploaded Image:</strong></p>
+    <img src="{{ image_url }}">
+  {% endif %}
+</div>
+
+<script>
+  function startDictation() {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert("Your browser doesn't support voice recognition.");
+      return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+      document.querySelector('textarea[name="message"]').value = event.results[0][0].transcript;
+      recognition.stop();
+    };
+
+    recognition.onerror = function(event) {
+      alert('Voice recognition error: ' + event.error);
+      recognition.stop();
+    };
+  }
+</script>
+{% endblock %}
